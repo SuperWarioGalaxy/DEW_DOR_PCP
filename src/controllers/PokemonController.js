@@ -31,6 +31,12 @@ export class PokemonController {
     this.filterType = document.querySelector("#filtroTipo");
     this.filterType.addEventListener("keyup", () => this.filteringPokemons());
 
+    this.filterType = document.querySelector("#filtroPeso");
+    this.filterType.addEventListener("keyup", () => this.filteringPokemons());
+
+    this.filterType = document.querySelector("#filtroPoderTotal");
+    this.filterType.addEventListener("keyup", () => this.filteringPokemons());
+
     // Bind Añadir a Lista de deseos
     document
       .querySelector("#btnAgnadeListaDeseo")
@@ -49,23 +55,34 @@ export class PokemonController {
 
   async filteringPokemons() {
     this.pokemonsFiltered = [];
+    
+    const tipoValue = document.querySelector("#filtroTipo").value.toLowerCase();
+    const pesoValue = document.querySelector("#filtroPeso").value;
+    const poderTotalValue = document.querySelector("#filtroPoderTotal").value;
+    
     this.model.pokemons.forEach((pkm) => {
-      this.safePokemon = false;
-
-      if (pkm.pkm_type[0].type.name.includes(this.filterType.value)) {
-        this.safePokemon = true;
-      } else if (
-        pkm.pkm_type.length > 1 &&
-        pkm.pkm_type[1].type.name.includes(this.filterType.value)
-      ) {
-        this.safePokemon = true;
-      }
-      if (this.safePokemon) {
-        this.pokemonsFiltered.push(pkm);
-      }
+    this.safePokemon = true;
+    
+    const tipoMatches = pkm.pkm_type.some(type => type.type.name.toLowerCase().includes(tipoValue));
+    if (tipoValue && !tipoMatches) {
+    this.safePokemon = false;
+    }
+    
+    if (pesoValue && pkm.weight < pesoValue) {
+    this.safePokemon = false;
+    }
+    
+    if (poderTotalValue && pkm.attack < poderTotalValue) {
+    this.safePokemon = false;
+    }
+    
+    if (this.safePokemon) {
+    this.pokemonsFiltered.push(pkm);
+    }
     });
+    
     this.view.displayPokemons(this.pokemonsFiltered);
-  }
+    }
 
   mostrarListaDeseo() {
     //console.log(this.newDesireList);
